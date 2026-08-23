@@ -1,0 +1,9 @@
+Legacy/reference files preserved before cleanup.
+
+package.json
+scripts/build-bookmarklet.js
+src/bookmarklet/pdf-export.js
+src/bookmarklet/ui.js
+src/state.js
+tests/bookmarklet.test.js
+tests/state.test.js

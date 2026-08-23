@@ -1,0 +1,32 @@
+{
+  "name": "ui-inspector",
+  "version": "0.1.0",
+  "description": "Privacy-safe inline bookmarklet for element-based Korean UI feedback.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build:bookmarklet": "node scripts/build-bookmarklet.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feed-mina/ui-inspector.git"
+  },
+  "keywords": [],
+  "author": "feed-mina",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/feed-mina/ui-inspector/issues"
+  },
+  "homepage": "https://feed-mina.github.io/ui-inspector/",
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.0.1",
+    "lz-string": "^1.5.0",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}
