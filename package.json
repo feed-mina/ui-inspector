@@ -8,8 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "build:bookmarklet": "node scripts/build-bookmarklet.js"
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",

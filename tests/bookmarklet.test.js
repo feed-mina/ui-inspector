@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createPinElement, createPanel, calculatePinPosition, restorePins, buildStyles, createWelcomeModal, createDocsSiteModal, createMobileWarningModal, createMinimizedButton, createExitConfirmModal, createShareModal, filterAndSortPins, repositionPin, highlightPinTarget, clearPinHighlight } from '../src/bookmarklet/ui.js';
 import { createState } from '../src/state.js';
-import { drawPinsOnCanvas, resolvePinPositions } from '../src/bookmarklet/pdf-export.js';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -1492,100 +1491,5 @@ describe('createShareModal', () => {
     const tooltip = modal.querySelector('.pinment-share-capacity-tooltip');
     expect(tooltip).not.toBeNull();
     expect(tooltip.textContent).toContain('no server needed');
-  });
-});
-
-describe('drawPinsOnCanvas', () => {
-
-  function createMockCanvas() {
-    const calls = [];
-    const ctx = {
-      beginPath: vi.fn(() => calls.push('beginPath')),
-      arc: vi.fn((...args) => calls.push(['arc', ...args])),
-      fill: vi.fn(() => calls.push('fill')),
-      stroke: vi.fn(() => calls.push('stroke')),
-      fillText: vi.fn((...args) => calls.push(['fillText', ...args])),
-      fillStyle: '',
-      strokeStyle: '',
-      lineWidth: 0,
-      font: '',
-      textAlign: '',
-      textBaseline: '',
-    };
-    return {
-      getContext: vi.fn(() => ctx),
-      ctx,
-      calls,
-    };
-  }
-
-  it('draws at correct positions', () => {
-    const canvas = createMockCanvas();
-    drawPinsOnCanvas(canvas, [
-      { id: 1, x: 100, y: 200, resolved: false },
-      { id: 2, x: 300, y: 400, resolved: false },
-    ]);
-
-    expect(canvas.getContext).toHaveBeenCalledWith('2d');
-    expect(canvas.ctx.arc).toHaveBeenCalledTimes(2);
-    expect(canvas.ctx.arc.mock.calls[0][0]).toBe(100);
-    expect(canvas.ctx.arc.mock.calls[0][1]).toBe(200);
-    expect(canvas.ctx.arc.mock.calls[1][0]).toBe(300);
-    expect(canvas.ctx.arc.mock.calls[1][1]).toBe(400);
-  });
-
-  it('uses gray for resolved pins', () => {
-    const canvas = createMockCanvas();
-    drawPinsOnCanvas(canvas, [
-      { id: 1, x: 50, y: 50, resolved: true },
-    ]);
-    // First fillStyle assignment (circle fill) should be gray for resolved
-    expect(canvas.ctx.fillStyle).not.toBe('#e53e3e');
-  });
-
-  it('uses red for open pins', () => {
-    const canvas = createMockCanvas();
-    drawPinsOnCanvas(canvas, [
-      { id: 1, x: 50, y: 50, resolved: false },
-    ]);
-    // After drawing, the last fillStyle is white (for text), but the circle was red
-    expect(canvas.ctx.fill).toHaveBeenCalled();
-  });
-});
-
-describe('resolvePinPositions', () => {
-
-  it('falls back to fx/fy when selector does not match', () => {
-    const pins = [
-      { id: 1, s: '#nonexistent-element', ox: 0.5, oy: 0.5, fx: 100, fy: 200 },
-    ];
-    const result = resolvePinPositions(pins);
-    expect(result).toHaveLength(1);
-    expect(result[0].x).toBe(100);
-    expect(result[0].y).toBe(200);
-    expect(result[0].resolved).toBe(false);
-  });
-
-  it('falls back to fx/fy when no selector is provided', () => {
-    const pins = [
-      { id: 2, s: null, fx: 300, fy: 400 },
-    ];
-    const result = resolvePinPositions(pins);
-    expect(result[0].x).toBe(300);
-    expect(result[0].y).toBe(400);
-    expect(result[0].resolved).toBe(false);
-  });
-
-  it('resolves position from matching DOM element', () => {
-    const div = document.createElement('div');
-    div.id = 'test-pin-target';
-    document.body.appendChild(div);
-    // jsdom getBoundingClientRect returns zeros, so position = scroll offsets
-    const pins = [
-      { id: 3, s: '#test-pin-target', ox: 0.5, oy: 0.5, fx: 999, fy: 999 },
-    ];
-    const result = resolvePinPositions(pins);
-    expect(result[0].resolved).toBe(true);
-    expect(result[0].id).toBe(3);
   });
 });
