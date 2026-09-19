@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["url", "pin"],
   "properties": {
-    "url": { "type": "string" },
+    "url": { "type": "string", "minLength": 1, "maxLength": 2048 },
     "viewport": { "type": "integer", "minimum": 1 },
     "pin": {
       "type": "object",
@@ -16,7 +16,7 @@
         "oy": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
         "fx": { "type": "number" },
         "fy": { "type": "number" },
-        "text": { "type": "string", "maxLength": 2000 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
         "author": { "type": "string", "maxLength": 100 },
         "c": { "type": "string", "enum": ["text", "layout", "missing", "question"] },
         "resolved": { "type": "boolean" }
