@@ -24,7 +24,7 @@ services:
       - pins-data:/var/lib/ui-inspector
     labels:
       traefik.enable: "true"
-      traefik.http.routers.ui-inspector.rule: "Host(`inspector.mindevprofile.kr`)"
+      traefik.http.routers.ui-inspector.rule: "Host(`inspector.feedmina.tech`)"
       traefik.http.routers.ui-inspector.entrypoints: "websecure"
       traefik.http.routers.ui-inspector.tls.certresolver: "letsencrypt"
       traefik.http.services.ui-inspector.loadbalancer.server.port: "8001"
