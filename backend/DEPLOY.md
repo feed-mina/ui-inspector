@@ -9,6 +9,21 @@
 주소는 키트 저장소 `studio/sdui-ui-inspector.js` 에 기본값으로 들어 있는 주소와 **같아야 합니다**.
 다른 주소를 쓰시려면 그 한 줄도 함께 바꿔야 합니다.
 
+## 먼저 — 이 서버가 비어 있습니까?
+
+80·443 포트를 이미 누가 쓰고 있는지부터 봅니다. 길이 갈립니다.
+
+```bash
+ss -tlnp | grep -E ':80 |:443 '
+```
+
+| 결과 | 갈 길 |
+|---|---|
+| 아무것도 안 나옴 | **길 A** — 아래 1~11절 (systemd + Nginx + certbot) |
+| `traefik`·`caddy`·`nginx`·`apache` 등이 잡고 있음 | **길 B** — 12절 (도커 컨테이너로 얹기). 1~11절은 건너뜁니다 |
+
+길 B 인데 길 A 를 따라가면 **돌고 있는 서비스의 입구를 끊게 됩니다.** 80 포트는 하나뿐입니다.
+
 | 무엇 | 값 |
 |---|---|
 | 바깥 주소 | `https://inspector.mindevprofile.kr` |
@@ -23,6 +38,12 @@
 (`gomgom-ai/server_log/장고랑워드프레스서버설정.md:60`), 나중에 한 서버로 합치더라도 겹치지 않게 하기 위해서입니다.
 
 ---
+
+---
+
+# 길 A — 빈 서버 (systemd + Nginx + certbot)
+
+0~11절입니다. 80 포트를 이미 쓰는 것이 있다면 여기가 아니라 **12절**로 가세요.
 
 ## 0. 준비물
 
@@ -68,6 +89,14 @@ ufw allow 'Nginx Full'
 ufw --force enable
 ufw status
 ```
+
+> Nginx 는 설치하는 순간 **부팅 시 자동 시작**으로 등록됩니다. 길 B 로 가기로 했다면
+> 반드시 꺼 두세요. 안 그러면 다음 재부팅 때 Nginx 가 먼저 80 을 잡아
+> 돌고 있던 서비스의 입구가 끊깁니다.
+>
+> ```bash
+> systemctl disable --now nginx
+> ```
 
 ---
 
@@ -279,3 +308,90 @@ sqlite3 /var/lib/ui-inspector/inspector.db ".backup '/root/inspector-$(date +%F)
 - **장부가 파일 하나입니다.** 지금 쓰임에는 충분하지만, 사람이 많아지면
   `INSPECTOR_DATABASE_URL` 만 Postgres 주소로 바꾸면 됩니다. 코드는 그대로입니다.
 - **핀 삭제와 답글 저장 창구는 아직 없습니다.** 표에는 자리가 있습니다.
+
+---
+
+# 길 B — 이미 Traefik 이 있는 서버에 얹기 (12절)
+
+80·443 을 Traefik 이 쓰고 있으면 Nginx 로 포트를 뺏을 수 없습니다. 대신 Traefik 이
+이미 하고 있는 일을 그대로 씁니다 — **라벨 붙인 컨테이너**로 얹으면 Traefik 이
+경로도 HTTPS 인증서도 알아서 처리합니다. Traefik 의 설정이나 컨테이너는 건드리지 않습니다.
+
+이 길에서는 1~11절 대신 아래만 하면 됩니다. `certbot` 도 필요 없습니다.
+
+## 12-1. Traefik 구성 확인
+
+```bash
+docker ps --format '{{.Names}}'
+docker inspect <traefik 컨테이너 이름> --format '{{json .Config.Cmd}}'
+```
+
+확인할 두 가지:
+
+| 찾을 것 | 예 | 쓰는 곳 |
+|---|---|---|
+| HTTPS entrypoint 이름 | `--entrypoints.websecure.address=:443` → `websecure` | `compose.yaml` 의 `entrypoints` |
+| 인증서 발급기 이름 | `--certificatesresolvers.letsencrypt.acme...` → `letsencrypt` | `compose.yaml` 의 `certresolver` |
+
+`compose.yaml` 은 이 두 이름이 `websecure`·`letsencrypt` 인 경우로 적혀 있습니다.
+다르면 그 두 줄만 바꿉니다.
+
+## 12-2. DNS
+
+1절과 같습니다. A 레코드 `inspector` → 서버 IP.
+Traefik 의 인증서 발급은 HTTP 챌린지라, **DNS 가 퍼진 뒤에야** 인증서가 나옵니다.
+
+## 12-3. 올리기
+
+```bash
+git clone https://github.com/feed-mina/ui-inspector.git /opt/ui-inspector/app
+cd /opt/ui-inspector/app/backend
+docker compose up -d --build
+docker compose ps
+```
+
+`ui-inspector-pins` 가 `running (healthy)` 가 되면 됩니다.
+`healthy` 까지 10~40초쯤 걸립니다.
+
+## 12-4. 확인
+
+컨테이너 안에서:
+
+```bash
+docker compose exec pins python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/healthz').read().decode())"
+```
+
+바깥에서(9절과 같은 명령):
+
+```bash
+curl -s https://inspector.mindevprofile.kr/healthz
+```
+
+## 12-5. 안 될 때
+
+| 증상 | 원인 | 할 일 |
+|---|---|---|
+| 바깥에서 404 | Traefik 이 라벨을 못 읽었다 | `docker compose config --format json` 로 라벨 확인, `docker logs <traefik>` |
+| 인증서 오류 | DNS 가 아직 안 퍼졌다 | `dig +short inspector.mindevprofile.kr` |
+| `unhealthy` | 창구가 안 떴다 | `docker compose logs pins` |
+| 컨테이너는 도는데 Traefik 이 못 닿음 | Traefik 이 다른 네트워크만 본다 | 라벨에 `traefik.docker.network` 를 더한다 |
+
+## 12-6. 평소 관리
+
+```bash
+cd /opt/ui-inspector/app
+git pull
+cd backend && docker compose up -d --build     # 갱신
+docker compose logs -f pins                    # 로그
+docker compose down                            # 내리기 (장부는 볼륨에 남는다)
+
+# 장부 백업
+docker run --rm -v ui-inspector_pins-data:/data -v "$PWD":/out alpine \
+  cp /data/inspector.db /out/inspector-$(date +%F).db
+```
+
+길 A 의 systemd 서비스를 먼저 만들어 두셨다면, 둘이 같이 돌 필요가 없으니 끄세요.
+
+```bash
+systemctl disable --now ui-inspector
+```
