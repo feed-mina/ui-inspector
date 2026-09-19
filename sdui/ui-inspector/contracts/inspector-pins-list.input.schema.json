@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PinsListInput",
+  "type": "object",
+  "required": ["url"],
+  "properties": {
+    "url": { "type": "string", "description": "주석 대상 페이지 주소. state.url 과 같은 값" },
+    "viewport": { "type": "integer", "minimum": 1, "description": "기준 뷰포트 너비. state.viewport" }
+  }
+}

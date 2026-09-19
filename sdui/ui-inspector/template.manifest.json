@@ -1,0 +1,438 @@
+{
+  "schema": "feedmina.sdui.template.v1",
+  "id": "ui-inspector-panel",
+  "name": "UI Inspector · 댓글 패널",
+  "version": "0.1.0",
+  "recommendedTier": "free",
+  "runtimeAdapters": [
+    "cloudflare-worker-static"
+  ],
+  "pluginValidation": "strict",
+  "documentVersion": 2,
+  "defaultLocale": "ko",
+  "locales": [
+    "ko"
+  ],
+  "messages": {
+    "ko": {
+      "pages.panel.title": "화면 댓글"
+    }
+  },
+  "metadata": {
+    "format": "inline"
+  },
+  "pages": [
+    {
+      "id": "panel",
+      "sourceKind": "page_key",
+      "title": "화면 댓글",
+      "route": "/panel/",
+      "metadataRef": "embedded:pages.panel",
+      "pluginRefs": [
+        "ui-inspector"
+      ],
+      "state": {
+        "editMode": true,
+        "shareOpen": false
+      },
+      "nodes": [
+        {
+          "id": "node_panel_root",
+          "name": "댓글 패널 전체",
+          "type": "Stack",
+          "props": {
+            "direction": "vertical"
+          },
+          "style": {
+            "gap": "var(--space-md)",
+            "padding": "var(--space-md)"
+          },
+          "states": {},
+          "children": [
+            {
+              "id": "node_panel_heading",
+              "name": "패널 제목",
+              "type": "Heading",
+              "props": {
+                "text": "화면 댓글",
+                "level": 2
+              },
+              "style": {},
+              "states": {},
+              "children": []
+            },
+            {
+              "id": "node_mode_bar",
+              "name": "모드 바",
+              "type": "Stack",
+              "props": {
+                "direction": "horizontal"
+              },
+              "style": {
+                "gap": "var(--space-sm)"
+              },
+              "states": {},
+              "children": [
+                {
+                  "id": "node_mode_edit",
+                  "name": "편집 모드 버튼",
+                  "type": "Button",
+                  "props": {
+                    "label": "편집",
+                    "variant": "primary"
+                  },
+                  "style": {},
+                  "states": {},
+                  "events": {
+                    "onClick": {
+                      "action": "setState",
+                      "target": "editMode",
+                      "value": true
+                    }
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_mode_browse",
+                  "name": "보기 모드 버튼",
+                  "type": "Button",
+                  "props": {
+                    "label": "보기",
+                    "variant": "primary"
+                  },
+                  "style": {},
+                  "states": {},
+                  "events": {
+                    "onClick": {
+                      "action": "setState",
+                      "target": "editMode",
+                      "value": false
+                    }
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "node_filter_bar",
+              "name": "필터 툴바",
+              "type": "Grid",
+              "props": {
+                "columns": 2
+              },
+              "style": {
+                "gap": "var(--space-sm)"
+              },
+              "states": {},
+              "children": [
+                {
+                  "id": "node_filter_category",
+                  "name": "카테고리 필터",
+                  "type": "Select",
+                  "props": {
+                    "label": "카테고리",
+                    "options": "전체|문구|레이아웃|누락|질문",
+                    "value": "전체"
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "category"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_filter_status",
+                  "name": "상태 필터",
+                  "type": "Select",
+                  "props": {
+                    "label": "상태",
+                    "options": "전체|미해결|해결됨",
+                    "value": "전체"
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "status"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_filter_author",
+                  "name": "작성자 필터",
+                  "type": "Select",
+                  "props": {
+                    "label": "작성자",
+                    "options": "전체",
+                    "value": "전체"
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "author"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_filter_sort",
+                  "name": "정렬",
+                  "type": "Select",
+                  "props": {
+                    "label": "정렬",
+                    "options": "번호순|상태순|카테고리순",
+                    "value": "번호순"
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "sort"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "node_pin_table",
+              "name": "핀 목록",
+              "type": "DataTable",
+              "props": {
+                "title": "핀 목록",
+                "columns": "번호|카테고리|내용|상태"
+              },
+              "style": {},
+              "states": {},
+              "source": {
+                "refDataId": "inspector.pins.list"
+              },
+              "children": []
+            },
+            {
+              "id": "node_comment_item",
+              "name": "선택한 핀",
+              "type": "Card",
+              "props": {
+                "title": "선택한 핀",
+                "description": "목록에서 핀을 고르면 내용이 채워집니다."
+              },
+              "style": {},
+              "states": {},
+              "children": [
+                {
+                  "id": "node_comment_text",
+                  "name": "댓글 입력",
+                  "type": "Textarea",
+                  "props": {
+                    "label": "댓글",
+                    "placeholder": "무엇이 잘못됐는지 적어 주세요",
+                    "value": ""
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "text"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_comment_category",
+                  "name": "카테고리 선택",
+                  "type": "Select",
+                  "props": {
+                    "label": "카테고리",
+                    "options": "문구|레이아웃|누락|질문",
+                    "value": "문구"
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "c"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_comment_resolved",
+                  "name": "해결 여부",
+                  "type": "Checkbox",
+                  "props": {
+                    "label": "해결됨",
+                    "checked": false
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "fieldId": "resolved"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "node_comment_save",
+                  "name": "저장 버튼",
+                  "type": "Button",
+                  "props": {
+                    "label": "저장",
+                    "variant": "primary"
+                  },
+                  "style": {},
+                  "states": {},
+                  "source": {
+                    "actionType": "inspector.pins.save"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "node_replies",
+              "name": "답글",
+              "type": "Card",
+              "props": {
+                "title": "답글",
+                "description": "선택한 핀에 달린 답글이 여기에 표시됩니다."
+              },
+              "style": {},
+              "states": {},
+              "children": []
+            },
+            {
+              "id": "node_footer",
+              "name": "푸터",
+              "type": "Stack",
+              "props": {
+                "direction": "horizontal"
+              },
+              "style": {
+                "gap": "var(--space-sm)"
+              },
+              "states": {},
+              "children": [
+                {
+                  "id": "node_share",
+                  "name": "공유 버튼",
+                  "type": "Button",
+                  "props": {
+                    "label": "공유 URL 만들기",
+                    "variant": "primary"
+                  },
+                  "style": {},
+                  "states": {},
+                  "events": {
+                    "onClick": {
+                      "action": "setState",
+                      "target": "shareOpen",
+                      "value": true
+                    }
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "node_share_modal",
+              "name": "공유 안내 창",
+              "type": "Modal",
+              "props": {
+                "title": "공유 URL",
+                "description": "URL 이 8000바이트를 넘으면 JSON 내보내기를 사용하세요.",
+                "actionLabel": "확인"
+              },
+              "style": {},
+              "states": {},
+              "visibleWhen": {
+                "state": "shareOpen",
+                "equals": true
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "components": [
+    "TEXT",
+    "INPUT",
+    "TEXTAREA",
+    "SELECT",
+    "CHECKBOX",
+    "BUTTON",
+    "GROUP"
+  ],
+  "plugins": [
+    {
+      "id": "ui-inspector",
+      "kind": "page-plugin",
+      "version": "1.0.0",
+      "contractVersion": "1.0",
+      "runtimeAdapters": [
+        "cloudflare-worker-static"
+      ],
+      "entry": "/studio/sdui-ui-inspector.js",
+      "entryMode": "host",
+      "permissions": [
+        "inspector:read",
+        "inspector:write"
+      ],
+      "dependencies": [],
+      "provides": {
+        "actions": {
+          "inspector.pins.save": {
+            "inputSchema": "contracts/inspector-pins-save.input.schema.json",
+            "outputSchema": "contracts/inspector-pins-save.output.schema.json",
+            "permissions": [
+              "inspector:write"
+            ],
+            "sideEffect": "write",
+            "idempotency": "optional",
+            "timeoutMs": 5000,
+            "errors": [
+              "VALIDATION_ERROR",
+              "PERMISSION_DENIED",
+              "PLUGIN_ERROR",
+              "TIMEOUT"
+            ]
+          }
+        },
+        "hydrators": {
+          "inspector.pins.list": {
+            "inputSchema": "contracts/inspector-pins-list.input.schema.json",
+            "outputSchema": "contracts/inspector-pins-list.output.schema.json",
+            "permissions": [
+              "inspector:read"
+            ],
+            "sideEffect": "read",
+            "idempotency": "none",
+            "timeoutMs": 5000
+          }
+        },
+        "widgets": {}
+      }
+    }
+  ],
+  "api": {
+    "contract": "api-contract.md",
+    "endpoints": [
+      {
+        "method": "GET",
+        "path": "/api/v1/inspector/pins",
+        "auth": "logged_in"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/inspector/pins",
+        "auth": "logged_in"
+      }
+    ]
+  },
+  "env": {
+    "secrets": []
+  },
+  "gating": {
+    "free": [
+      "metadata",
+      "manual-preview"
+    ]
+  },
+  "risks": [
+    "핀 오버레이는 Studio 요소로 표현할 수 없어 플러그인이 담당한다 (허용 스타일에 position/left/top 없음)."
+  ]
+}

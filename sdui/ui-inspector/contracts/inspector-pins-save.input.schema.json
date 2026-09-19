@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PinsSaveInput",
+  "type": "object",
+  "required": ["url", "pin"],
+  "properties": {
+    "url": { "type": "string" },
+    "viewport": { "type": "integer", "minimum": 1 },
+    "pin": {
+      "type": "object",
+      "required": ["fx", "fy", "text"],
+      "properties": {
+        "id": { "type": ["number", "null"], "description": "없으면 새 핀" },
+        "s": { "type": ["string", "null"] },
+        "ox": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "oy": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "fx": { "type": "number" },
+        "fy": { "type": "number" },
+        "text": { "type": "string", "maxLength": 2000 },
+        "author": { "type": "string", "maxLength": 100 },
+        "c": { "type": "string", "enum": ["text", "layout", "missing", "question"] },
+        "resolved": { "type": "boolean" }
+      }
+    }
+  }
+}
