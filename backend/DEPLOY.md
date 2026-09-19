@@ -1,6 +1,6 @@
 # 호스팅어 VPS 배포 — 핀 저장 창구
 
-이 문서대로 하면 `https://inspector.mindevprofile.kr` 에서 창구가 열립니다.
+이 문서대로 하면 `https://inspector.feedmina.tech` 에서 창구가 열립니다.
 
 > **상품을 먼저 확인하세요.** 호스팅어의 **VPS**(서버 한 대를 통째로 빌리는 상품)여야 합니다.
 > 공유호스팅에서는 되지 않습니다 — 공유호스팅은 파이썬 앱을 옛 방식(WSGI)으로만 실행하고,
@@ -26,7 +26,7 @@ ss -tlnp | grep -E ':80 |:443 '
 
 | 무엇 | 값 |
 |---|---|
-| 바깥 주소 | `https://inspector.mindevprofile.kr` |
+| 바깥 주소 | `https://inspector.feedmina.tech` |
 | 안쪽 포트 | `127.0.0.1:8001` (바깥에서 직접 닿지 않음) |
 | 코드 위치 | `/opt/ui-inspector/app` |
 | 파이썬 환경 | `/opt/ui-inspector/venv` |
@@ -49,7 +49,7 @@ ss -tlnp | grep -E ':80 |:443 '
 
 - 호스팅어 VPS 한 대 (Ubuntu 22.04 또는 24.04), `root` 로 SSH 접속 가능
 - VPS 의 공인 IP 주소 하나 (호스팅어 관리 화면에 있습니다)
-- `mindevprofile.kr` 의 DNS 를 고칠 수 있는 권한
+- `feedmina.tech` 의 DNS 를 고칠 수 있는 권한
 
 아래 명령은 모두 **VPS 안에서** 실행합니다. `<VPS_IP>` 만 실제 값으로 바꾸세요.
 
@@ -66,7 +66,7 @@ ss -tlnp | grep -E ':80 |:443 '
 확인 — 내 컴퓨터에서:
 
 ```bash
-dig +short inspector.mindevprofile.kr
+dig +short inspector.feedmina.tech
 ```
 
 VPS 의 IP 가 나오면 됩니다. 바로 안 나오면 몇 분에서 몇 시간 기다립니다.
@@ -199,7 +199,7 @@ curl -s http://127.0.0.1:8001/healthz
 cat > /etc/nginx/sites-available/inspector <<'EOF'
 server {
     listen 80;
-    server_name inspector.mindevprofile.kr;
+    server_name inspector.feedmina.tech;
 
     location / {
         proxy_pass http://127.0.0.1:8001;
@@ -225,7 +225,7 @@ nginx -t && systemctl reload nginx
 1번의 DNS 가 퍼진 뒤에 합니다.
 
 ```bash
-certbot --nginx -d inspector.mindevprofile.kr
+certbot --nginx -d inspector.feedmina.tech
 ```
 
 성공하면 Nginx 설정이 자동으로 443 을 쓰도록 바뀌고, 갱신은 시스템이 알아서 합니다.
@@ -241,15 +241,15 @@ systemctl status certbot.timer --no-pager
 서버 바깥(내 컴퓨터)에서:
 
 ```bash
-curl -s https://inspector.mindevprofile.kr/healthz
+curl -s https://inspector.feedmina.tech/healthz
 ```
 
 ```bash
-curl -s "https://inspector.mindevprofile.kr/api/v1/inspector/pins?url=https://example.com/&viewport=1280"
+curl -s "https://inspector.feedmina.tech/api/v1/inspector/pins?url=https://example.com/&viewport=1280"
 ```
 
 ```bash
-curl -s -X POST https://inspector.mindevprofile.kr/api/v1/inspector/pins \
+curl -s -X POST https://inspector.feedmina.tech/api/v1/inspector/pins \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/","viewport":1280,"pin":{"s":"#main > h1","ox":0.5,"oy":0.5,"fx":120,"fy":90,"text":"제목이 잘립니다","c":"layout"}}'
 ```
@@ -364,7 +364,7 @@ docker compose exec pins python -c "import urllib.request; print(urllib.request.
 바깥에서(9절과 같은 명령):
 
 ```bash
-curl -s https://inspector.mindevprofile.kr/healthz
+curl -s https://inspector.feedmina.tech/healthz
 ```
 
 ## 12-5. 안 될 때
@@ -372,7 +372,7 @@ curl -s https://inspector.mindevprofile.kr/healthz
 | 증상 | 원인 | 할 일 |
 |---|---|---|
 | 바깥에서 404 | Traefik 이 라벨을 못 읽었다 | `docker compose config --format json` 로 라벨 확인, `docker logs <traefik>` |
-| 인증서 오류 | DNS 가 아직 안 퍼졌다 | `dig +short inspector.mindevprofile.kr` |
+| 인증서 오류 | DNS 가 아직 안 퍼졌다 | `dig +short inspector.feedmina.tech` |
 | `unhealthy` | 창구가 안 떴다 | `docker compose logs pins` |
 | 컨테이너는 도는데 Traefik 이 못 닿음 | Traefik 이 다른 네트워크만 본다 | 라벨에 `traefik.docker.network` 를 더한다 |
 

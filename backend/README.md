@@ -12,7 +12,7 @@ SDUI 게시 화면의 댓글 패널이 핀을 저장하고 불러오는 서버�
 
 부르는 쪽은 SDUI 키트 저장소의 `studio/sdui-ui-inspector.js` 입니다.
 키트가 만드는 게시 페이지에는 `<meta>` 를 넣을 자리가 없어서, 그 파일에 기본 주소
-`https://inspector.mindevprofile.kr` 가 들어 있습니다. **이 창구를 올리는 주소가 그 값과 같아야 합니다.**
+`https://inspector.feedmina.tech` 가 들어 있습니다. **이 창구를 올리는 주소가 그 값과 같아야 합니다.**
 
 응답 봉투는 키트 표준 `{ "ok": ..., "data": ..., "errors": [] }` 입니다.
 `data.v` 는 항상 `2` 입니다. 다른 값이면 북마클릿의 `validateState` 가 상태 전체를 버립니다.
