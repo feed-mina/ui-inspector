@@ -20,6 +20,7 @@ from app.main import app, get_connection  # noqa: E402
 
 REPO_ROOT = BACKEND_ROOT.parent
 CONTRACT_DIR = REPO_ROOT / "sdui" / "ui-inspector" / "contracts"
+MANIFEST_PATH = REPO_ROOT / "sdui" / "ui-inspector" / "template.manifest.json"
 
 
 @pytest.fixture()

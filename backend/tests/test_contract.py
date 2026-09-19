@@ -10,7 +10,7 @@ import json
 import pytest
 from jsonschema import Draft202012Validator
 
-from conftest import CONTRACT_DIR
+from conftest import CONTRACT_DIR, MANIFEST_PATH
 from app.db import PIN_CATEGORIES
 from app.schemas import PinIn, PinsSaveInput
 
@@ -107,3 +107,38 @@ def test_schema_version_is_fixed_at_two(client):
     body = client.get("/api/v1/inspector/pins", params={"url": PAGE}).json()
     # 다르면 북마클릿의 validateState 가 상태 전체를 null 로 버린다(src/state.js:51).
     assert body["data"]["v"] == const == 2
+
+
+# manifest 는 계약 4장을 문자열 경로가 아니라 값으로 품고 있다. Studio 의 파일
+# 가져오기가 JSON 한 장만 받기 때문이다(#manifest-file 입력에 multiple 도
+# webkitdirectory 도 없다). 형제 파일을 참조하면 브라우저로는 가져올 수 없다.
+MANIFEST_SCHEMAS = {
+    ("actions", "inspector.pins.save", "inputSchema"): "inspector-pins-save.input",
+    ("actions", "inspector.pins.save", "outputSchema"): "inspector-pins-save.output",
+    ("hydrators", "inspector.pins.list", "inputSchema"): "inspector-pins-list.input",
+    ("hydrators", "inspector.pins.list", "outputSchema"): "inspector-pins-list.output",
+}
+
+
+def manifest_plugin() -> dict:
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    return next(plugin for plugin in manifest["plugins"] if plugin["id"] == "ui-inspector")
+
+
+def test_manifest_inlines_the_same_schemas_as_the_contract_files():
+    plugin = manifest_plugin()
+    for (kind, operation, key), name in MANIFEST_SCHEMAS.items():
+        assert plugin["provides"][kind][operation][key] == contract(name), f"{operation}.{key}"
+
+
+def test_manifest_references_no_sibling_files():
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert "contract" not in manifest.get("api", {}), "api.contract 는 파일 참조라 가져오기를 막는다"
+
+    plugin = manifest_plugin()
+    assert plugin.get("entryMode") == "host", "package entry 도 파일 참조가 된다"
+    for kind in ("actions", "hydrators", "widgets"):
+        for operation, definition in (plugin["provides"].get(kind) or {}).items():
+            for key, value in definition.items():
+                if key.endswith("Schema"):
+                    assert not isinstance(value, str), f"{operation}.{key} 가 파일 경로다"

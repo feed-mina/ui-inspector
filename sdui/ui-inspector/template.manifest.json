@@ -376,8 +376,110 @@
       "provides": {
         "actions": {
           "inspector.pins.save": {
-            "inputSchema": "contracts/inspector-pins-save.input.schema.json",
-            "outputSchema": "contracts/inspector-pins-save.output.schema.json",
+            "inputSchema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "title": "PinsSaveInput",
+              "type": "object",
+              "required": [
+                "url",
+                "pin"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "viewport": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "pin": {
+                  "type": "object",
+                  "required": [
+                    "fx",
+                    "fy",
+                    "text"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "없으면 새 핀"
+                    },
+                    "s": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ox": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "oy": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "fx": {
+                      "type": "number"
+                    },
+                    "fy": {
+                      "type": "number"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    },
+                    "author": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "c": {
+                      "type": "string",
+                      "enum": [
+                        "text",
+                        "layout",
+                        "missing",
+                        "question"
+                      ]
+                    },
+                    "resolved": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "outputSchema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "title": "PinsSaveOutput",
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "저장된 핀 id"
+                },
+                "created": {
+                  "type": "boolean",
+                  "description": "새로 만들어졌으면 true"
+                }
+              }
+            },
             "permissions": [
               "inspector:write"
             ],
@@ -394,8 +496,144 @@
         },
         "hydrators": {
           "inspector.pins.list": {
-            "inputSchema": "contracts/inspector-pins-list.input.schema.json",
-            "outputSchema": "contracts/inspector-pins-list.output.schema.json",
+            "inputSchema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "title": "PinsListInput",
+              "type": "object",
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "description": "주석 대상 페이지 주소. state.url 과 같은 값"
+                },
+                "viewport": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "기준 뷰포트 너비. state.viewport"
+                }
+              }
+            },
+            "outputSchema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "title": "PinsListOutput",
+              "type": "object",
+              "required": [
+                "v",
+                "url",
+                "viewport",
+                "pins"
+              ],
+              "properties": {
+                "v": {
+                  "const": 2,
+                  "description": "state.js SCHEMA_VERSION"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "viewport": {
+                  "type": "number"
+                },
+                "env": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "pins": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/pin"
+                  }
+                }
+              },
+              "$defs": {
+                "pin": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "fx",
+                    "fy",
+                    "text"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "s": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "조회키. 화면 요소 CSS 선택자"
+                    },
+                    "ox": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "oy": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "fx": {
+                      "type": "number",
+                      "description": "폴백 좌표 x"
+                    },
+                    "fy": {
+                      "type": "number",
+                      "description": "폴백 좌표 y"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "author": {
+                      "type": "string"
+                    },
+                    "c": {
+                      "type": "string",
+                      "enum": [
+                        "text",
+                        "layout",
+                        "missing",
+                        "question"
+                      ]
+                    },
+                    "resolved": {
+                      "type": "boolean"
+                    },
+                    "replies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "text"
+                        ],
+                        "properties": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "author": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "permissions": [
               "inspector:read"
             ],
@@ -409,7 +647,6 @@
     }
   ],
   "api": {
-    "contract": "api-contract.md",
     "endpoints": [
       {
         "method": "GET",
