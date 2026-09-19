@@ -30,8 +30,9 @@ Studio 는 요소 24종과 스타일 11종만 받습니다(`base-elements.js`).
 | `inspector.pins.save` (action) | `POST /api/v1/inspector/pins` |
 
 계약 스키마는 `src/state.js` 의 `validateState`(스키마 버전 2)를 그대로 옮긴 것입니다.
-백엔드와 DB 는 아직 없습니다. 만드는 방법은 `docs/ui-inspector-sdui-fix-guide.html` 의
-5·6번 단계에 있습니다.
+이 두 창구의 구현은 [`backend/`](../../backend/) 에 FastAPI 로 있습니다
+(표 두 개는 `backend/schema.sql`). 설계 근거는 `docs/ui-inspector-sdui-fix-guide.html` 의
+5·6번 단계입니다.
 
 ## 검증
 

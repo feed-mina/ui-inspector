@@ -15,3 +15,8 @@ action `inspector.pins.save` 가 호출한다.
 조회키와 저장키의 구분은 어제 인수인계 문서와 같다.
 `pin.s` 는 화면 요소를 다시 찾기 위한 조회키이고,
 `pin.fx`/`pin.fy`/`pin.text`/`pin.replies` 는 보관용 저장 데이터다.
+
+## 구현
+
+이 계약의 서버 구현은 저장소의 [`backend/`](../../backend/) 에 있습니다(FastAPI).
+`backend/tests/test_contract.py` 가 실제 요청·응답을 이 폴더의 스키마로 검사합니다.

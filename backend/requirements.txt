@@ -1,0 +1,7 @@
+# 창구를 띄우는 데 필요한 것만.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+pydantic>=2.7
+# Postgres 드라이버. SQLite 로만 쓸 거면 빼도 된다.
+psycopg2-binary>=2.9
