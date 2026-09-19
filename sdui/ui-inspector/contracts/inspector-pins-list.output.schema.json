@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PinsListOutput",
+  "type": "object",
+  "required": ["v", "url", "viewport", "pins"],
+  "properties": {
+    "v": { "const": 2, "description": "state.js SCHEMA_VERSION" },
+    "url": { "type": "string" },
+    "viewport": { "type": "number" },
+    "env": { "type": ["object", "null"] },
+    "pins": { "type": "array", "items": { "$ref": "#/$defs/pin" } }
+  },
+  "$defs": {
+    "pin": {
+      "type": "object",
+      "required": ["id", "fx", "fy", "text"],
+      "properties": {
+        "id": { "type": "number" },
+        "s": { "type": ["string", "null"], "description": "조회키. 화면 요소 CSS 선택자" },
+        "ox": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "oy": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "fx": { "type": "number", "description": "폴백 좌표 x" },
+        "fy": { "type": "number", "description": "폴백 좌표 y" },
+        "text": { "type": "string" },
+        "author": { "type": "string" },
+        "c": { "type": "string", "enum": ["text", "layout", "missing", "question"] },
+        "resolved": { "type": "boolean" },
+        "replies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["text"],
+            "properties": { "text": { "type": "string" }, "author": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}
