@@ -7,8 +7,17 @@ Studio 편집기에서 열고 게시하기 위한 화면 정의입니다.
 | 파일 | 역할 |
 |---|---|
 | `template.manifest.json` | 패널 화면 정의(`feedmina.sdui.template.v1`). Studio 가져오기의 입력 |
-| `contracts/*.schema.json` | action·hydrator 입출력 JSON Schema 4장 |
+| `contracts/*.schema.json` | action·hydrator 입출력 JSON Schema 4장. 계약의 정본 |
 | `api-contract.md` | 백엔드 창구 요약 |
+
+**manifest 는 계약 4장을 파일 경로가 아니라 값으로 품고 있습니다.** Studio 의
+파일 가져오기는 JSON 한 장만 받아서(입력에 `multiple` 도 `webkitdirectory` 도 없음)
+형제 파일을 함께 줄 방법이 없기 때문입니다. 경로로 두면
+`패키지 파일을 찾을 수 없습니다` 로 가져오기가 막힙니다.
+
+두 쪽이 갈라지지 않도록 `backend/tests/test_contract.py` 가 manifest 안의 스키마와
+`contracts/` 의 파일이 같은지 확인합니다. 계약을 고칠 때는 `contracts/` 를 고치고
+manifest 에도 같은 내용을 넣어야 합니다.
 
 ## 무엇이 옮겨졌고 무엇이 아닌가
 
