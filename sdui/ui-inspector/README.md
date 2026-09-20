@@ -31,6 +31,17 @@ Studio 는 요소 24종과 스타일 11종만 받습니다(`base-elements.js`).
 | `calculatePinPosition` · `repositionPin` · `createPinElement` · `restorePins` | **요소로 표현 불가.** 허용 스타일에 `position`·`left`·`top` 이 없음 → 플러그인 |
 | `highlightPinTarget` · `clearPinHighlight` | 대상 페이지 DOM 조작 → 플러그인 |
 
+## 부르는 주소를 선언합니다
+
+```json
+"api": { "origins": ["https://inspector.feedmina.tech"], "endpoints": [ … ] }
+```
+
+게시 페이지의 보안 정책(CSP)은 기본이 `connect-src 'self'` 라, 선언하지 않으면
+브라우저가 창구 호출을 막습니다. `api.origins` 에 적힌 https 출처만 허용 목록에
+들어갑니다. 창구를 다른 주소로 옮기면 이 값과 키트의 플러그인 기본 주소를 함께
+바꿔야 합니다 — 둘 중 하나만 바뀌면 끊깁니다.
+
 ## 대응하는 백엔드 창구
 
 | manifest 선언 | 경로 |

@@ -142,3 +142,14 @@ def test_manifest_references_no_sibling_files():
             for key, value in definition.items():
                 if key.endswith("Schema"):
                     assert not isinstance(value, str), f"{operation}.{key} 가 파일 경로다"
+
+
+def test_manifest_declares_the_backend_origin():
+    # 게시 페이지의 CSP connect-src 는 여기 선언된 출처만 허용한다
+    # (키트 src/published-page.js). 빠지면 화면에서 창구 호출이 브라우저에 막힌다.
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    origins = manifest["api"]["origins"]
+    assert origins == ["https://inspector.feedmina.tech"]
+
+    for endpoint in manifest["api"]["endpoints"]:
+        assert endpoint["path"].startswith("/api/v1/inspector/"), endpoint
