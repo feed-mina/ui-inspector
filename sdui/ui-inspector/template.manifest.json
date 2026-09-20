@@ -647,6 +647,9 @@
     }
   ],
   "api": {
+    "origins": [
+      "https://inspector.feedmina.tech"
+    ],
     "endpoints": [
       {
         "method": "GET",
